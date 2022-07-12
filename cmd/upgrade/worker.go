@@ -63,6 +63,7 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Favicon icon file
 func Favicon(writer http.ResponseWriter, request *http.Request) {
 	content, err := f.ReadFile("favicon.ico")
 	if err != nil {

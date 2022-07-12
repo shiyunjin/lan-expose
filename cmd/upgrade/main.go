@@ -16,7 +16,7 @@ func main() {
 
 	common, err := config.ParseUpgrade(*configFile)
 	if err != nil {
-		log.Fatalf("Fail to read file: %v", err)
+		log.Fatalf("Fail to parse config file: %v", err)
 		return
 	}
 
@@ -43,5 +43,5 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	<-c
-	log.Println("shutdown server")
+	log.Println("Shutdown Server")
 }
