@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -16,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	if *v {
-		version.FormatFullVersion("Lan Expose Proxy")
+		fmt.Println(version.FormatFullVersion("Lan Expose Proxy"))
 		return
 	}
 

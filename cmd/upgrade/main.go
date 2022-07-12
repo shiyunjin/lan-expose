@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	if *v {
-		version.FormatFullVersion("Lan Expose Upgrade")
+		fmt.Println(version.FormatFullVersion("Lan Expose Upgrade"))
 		return
 	}
 
