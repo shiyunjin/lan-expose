@@ -1,0 +1,12 @@
+FROM golang:1.18 AS building
+
+COPY . /building
+WORKDIR /building
+
+RUN make proxy
+
+FROM alpine:3
+
+COPY --from=building /building/bin/lan_expose_proxy /usr/bin/lan_expose_proxy
+
+ENTRYPOINT ["/usr/bin/lan_expose_proxy"]

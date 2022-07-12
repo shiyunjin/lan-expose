@@ -1,0 +1,12 @@
+FROM golang:1.18 AS building
+
+COPY . /building
+WORKDIR /building
+
+RUN make upgrade
+
+FROM alpine:3
+
+COPY --from=building /building/bin/lan_expose_upgrade /usr/bin/lan_expose_upgrade
+
+ENTRYPOINT ["/usr/bin/lan_expose_upgrade"]
