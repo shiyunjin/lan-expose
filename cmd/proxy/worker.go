@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/config"
 )
 
 func Worker(w http.ResponseWriter, r *http.Request) {

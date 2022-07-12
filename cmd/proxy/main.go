@@ -6,12 +6,19 @@ import (
 	"os"
 	"os/signal"
 
-	"lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/version"
 )
 
 func main() {
 	configFile := flag.String("c", "proxy.ini", "config file")
+	v := flag.Bool("v", false, "show version")
 	flag.Parse()
+
+	if *v {
+		version.FormatFullVersion("Lan Expose Proxy")
+		return
+	}
 
 	common, err := config.ParseProxy(*configFile)
 	if err != nil {

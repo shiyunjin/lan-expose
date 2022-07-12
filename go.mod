@@ -1,4 +1,4 @@
-module lan-expose
+module github.com/shiyunjin/lan-expose
 
 go 1.18
 

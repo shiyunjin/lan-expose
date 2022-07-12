@@ -7,12 +7,19 @@ import (
 	"os"
 	"os/signal"
 
-	"lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/version"
 )
 
 func main() {
 	configFile := flag.String("c", "upgrade.ini", "config file")
+	v := flag.Bool("v", false, "show version")
 	flag.Parse()
+
+	if *v {
+		version.FormatFullVersion("Lan Expose Upgrade")
+		return
+	}
 
 	common, err := config.ParseUpgrade(*configFile)
 	if err != nil {

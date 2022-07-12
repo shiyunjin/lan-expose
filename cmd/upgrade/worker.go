@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/netinternet/remoteaddr"
-	"lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/config"
 )
 
 //go:embed index.html
