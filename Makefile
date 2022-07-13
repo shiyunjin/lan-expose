@@ -27,12 +27,12 @@ all: upgrade proxy
 
 .PHONY: upgrade
 upgrade:
-	go build -mod vendor -ldflags "$(LDFLAGS)" -o bin/lan_expose_upgrade github.com/shiyunjin/lan-expose/cmd/upgrade
+	env CGO_ENABLED=0 go build -mod vendor -ldflags "$(LDFLAGS)" -o bin/lan_expose_upgrade github.com/shiyunjin/lan-expose/cmd/upgrade
 
 
 .PHONY: proxy
 proxy:
-	go build -mod vendor -ldflags "$(LDFLAGS)" -o bin/lan_expose_proxy github.com/shiyunjin/lan-expose/cmd/proxy
+	env CGO_ENABLED=0 go build -mod vendor -ldflags "$(LDFLAGS)" -o bin/lan_expose_proxy github.com/shiyunjin/lan-expose/cmd/proxy
 
 ##################################################################################################################################
 
