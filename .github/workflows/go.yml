@@ -1,0 +1,36 @@
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+
+    - name: Vet
+      run: go vet -v ./...
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Build
+      run: make all
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-86_64
+        path: bin/
