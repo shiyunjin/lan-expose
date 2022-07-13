@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="lan-expose upgrade" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="lan-expose" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-c conf/upgrade.ignore.ini" />
+    <kind value="PACKAGE" />
+    <package value="github.com/shiyunjin/lan-expose/cmd/upgrade" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
