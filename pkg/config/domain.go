@@ -34,12 +34,16 @@ func (d *DomainList) Init(services ServiceList) {
 }
 
 func (d *DomainList) Order() {
-	sort.SliceStable(d, func(i, j int) bool {
-		if len((*d)[i].Domain) < len((*d)[j].Domain) {
+	sort.SliceStable(*d, func(i, j int) bool {
+		if !(*d)[i].Suffix && (*d)[j].Suffix {
 			return true
 		}
 
-		if !(*d)[i].Suffix && (*d)[j].Suffix {
+		if (*d)[i].Suffix && !(*d)[j].Suffix {
+			return false
+		}
+
+		if len((*d)[i].Domain) < len((*d)[j].Domain) {
 			return true
 		}
 
