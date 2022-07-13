@@ -39,7 +39,8 @@ jobs:
     - name: Build and push Docker image for Upgrade
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
-        context: ./Dockerfile-for-upgrade
+        context: .
+        file: ./Dockerfile-for-upgrade
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -67,7 +68,8 @@ jobs:
     - name: Build and push Docker image for Proxy
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
-        context: ./Dockerfile-for-proxy
+        context: .
+        file: ./Dockerfile-for-proxy
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
