@@ -21,7 +21,12 @@ func ParseUpgrade(configFile string) (ServerUpgradeCommon, error) {
 	}
 
 	// config common
-	if err := cfg.MapTo(&globalServerUpgradeCommon); err != nil {
+	commonSection, err := cfg.GetSection("common")
+	if err != nil {
+		return globalServerUpgradeCommon, err
+	}
+
+	if err := commonSection.MapTo(&globalServerUpgradeCommon); err != nil {
 		return globalServerUpgradeCommon, err
 	}
 

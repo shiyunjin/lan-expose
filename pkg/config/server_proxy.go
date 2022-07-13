@@ -21,7 +21,12 @@ func ParseProxy(configFile string) (ServerProxyCommon, error) {
 	}
 
 	// config common
-	if err := cfg.MapTo(&globalServerProxyCommon); err != nil {
+	commonSection, err := cfg.GetSection("common")
+	if err != nil {
+		return globalServerProxyCommon, err
+	}
+
+	if err := commonSection.MapTo(&globalServerProxyCommon); err != nil {
 		return globalServerProxyCommon, err
 	}
 
