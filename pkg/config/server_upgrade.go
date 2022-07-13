@@ -15,7 +15,9 @@ type ServerUpgradeCommon struct {
 }
 
 func ParseUpgrade(configFile string) (ServerUpgradeCommon, error) {
-	cfg, err := ini.Load(configFile)
+	cfg, err := ini.LoadSources(ini.LoadOptions{
+		AllowShadows: true,
+	}, configFile)
 	if err != nil {
 		return globalServerUpgradeCommon, err
 	}
