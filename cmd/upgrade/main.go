@@ -40,15 +40,26 @@ func main() {
 
 	httpServer.Handler = mux
 
+	c := make(chan os.Signal, 1)
+
 	if common.SSL {
-		go httpServer.ListenAndServeTLS(common.SSLCrt, common.SSLKey)
+		go func() {
+			if err := httpServer.ListenAndServeTLS(common.SSLCrt, common.SSLKey); err != nil {
+				log.Printf("[Serve][Error] listen and serve: %v\n", err)
+				c <- os.Interrupt
+			}
+		}()
 	} else {
-		go httpServer.ListenAndServe()
+		go func() {
+			if err := httpServer.ListenAndServe(); err != nil {
+				log.Printf("[Serve][Error] listen and serve: %v\n", err)
+				c <- os.Interrupt
+			}
+		}()
 	}
 
 	log.Printf("Start LanExpose Upgrade Server on: %s\n", listenAddress)
 
-	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	<-c
 	log.Println("Shutdown Server")
