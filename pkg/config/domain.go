@@ -53,7 +53,7 @@ func (d *DomainList) Order() {
 
 func (d DomainList) Search(domain string) (Domain, bool) {
 	for _, item := range d {
-		if item.Suffix && strings.HasSuffix(item.Domain, domain) {
+		if item.Suffix && strings.HasSuffix(domain, item.Domain) {
 			return item, true
 		} else if item.Domain == domain {
 			return item, true
