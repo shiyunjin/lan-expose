@@ -12,6 +12,7 @@ type ServerUpgradeCommon struct {
 	SSL     bool   `ini:"ssl"`
 	SSLCrt  string `ini:"ssl_crt,omitempty"`
 	SSLKey  string `ini:"ssl_key,omitempty"`
+	CheckMS uint32 `ini:"check_ms,omitempty"`
 }
 
 const (
@@ -56,20 +57,22 @@ func ParseUpgrade(configFile string) (ServerUpgradeCommon, error) {
 			continue
 		}
 
-		port := Port{}
-		if err := port.Set(section.Key("dest_port").Value()); err != nil {
-			return globalServerUpgradeCommon, err
+		service := Service{}
+		if err := section.MapTo(&service); err != nil {
+			return ServerUpgradeCommon{}, err
 		}
 
-		services.Add(name, Service{
-			Domain:       section.Key("domain").ValueWithShadows(),
-			DomainSuffix: section.Key("domain_suffix").ValueWithShadows(),
-			DestDomain:   section.Key("dest_domain").Value(),
-			DestPort:     port.Get(),
+		port := Port{}
+		if err := port.Set(service.DestPort); err != nil {
+			return globalServerUpgradeCommon, err
+		}
+		service.DestPort = port.Get()
 
-			WebSocketMode:          section.Key("websocket_mode").Value(),
-			WebSocketMode302Domain: section.Key("websocket_mode_302_domain").Value(),
-		})
+		if service.CheckMS == 0 {
+			service.CheckMS = 2000 // default check 2000 ms
+		}
+
+		services.Add(name, service)
 	}
 
 	Domains = []Domain{}

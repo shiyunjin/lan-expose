@@ -14,6 +14,21 @@ import (
 //go:embed favicon.ico
 var f embed.FS
 
+var (
+	checkT     *template.Template
+	checkTHave = false
+)
+
+func init() {
+	var err error
+	checkT, err = template.ParseFS(f, "index.html")
+	if err != nil {
+		log.Printf("internal check template error: %v", err)
+		return
+	}
+	checkTHave = true
+}
+
 func Worker(w http.ResponseWriter, r *http.Request) {
 	// ext info
 	ip, _ := remoteaddr.Parse().IP(r)
@@ -50,19 +65,23 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[Request][Hit] %s => %s : %s[%s]", r.Host, altAddr, ip, requestId)
 
 	// send html
-	t, err := template.ParseFS(f, "index.html")
-	if err != nil {
-		log.Printf("template error: %v", err)
+	if !checkTHave {
 		_, _ = w.Write([]byte("This service requires use of the HTTP/3.0 protocol, wait reload.<script>location.reload();</script>"))
-		return
 	}
 
-	if err := t.Execute(w, struct {
+	checkMS := config.GetServerUpgradeCommon().CheckMS
+	if service.CheckMS != 0 {
+		checkMS = service.CheckMS
+	}
+
+	if err := checkT.Execute(w, struct {
 		IP        string
 		RequestID string
+		CheckMS   uint32
 	}{
 		IP:        ip,
 		RequestID: requestId,
+		CheckMS:   checkMS,
 	}); err != nil {
 		log.Printf("failed to execute template: %v", err)
 	}
