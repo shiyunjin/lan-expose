@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+data:
+  upgrade.ini: |-
+    [common]
+    address = 0.0.0.0
+    port = 80
+    ssl = false
+    ssl_crt = ./ssl.crt
+    ssl_key = ./ssl.key
+    
+    
+    [service.home]
+    domain_suffix = all.demo.cn
+    domain_suffix = all.demo.com
+    domain = home.demo.cn
+    domain = home.demo.com
+    dest_domain = ddns.home.domain
+    dest_port = 690
+kind: ConfigMap
+metadata:
+  name: lan-expose-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: lan-expose
+  name: lan-expose
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lan-expose
+  template:
+    spec:
+      containers:
+        - args:
+            - -c
+            - /config/upgrade.ini
+          image: ghcr.io/shiyunjin/lan-expose-upgrade:test
+          imagePullPolicy: Always
+          name: upgrade
+          ports:
+            - containerPort: 80
+              name: http-80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: config
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: lan-expose-config
+            optional: false
+          name: config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: letsencrypt # need cert-manager
+  name: lan-expose
+spec:
+  rules:
+    - host: '*.all.demo.cn'
+      http:
+        paths:
+          - backend:
+              service:
+                name: lan-expose
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: '*.all.demo.com'
+      http:
+        paths:
+          - backend:
+              service:
+                name: lan-expose
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: 'home.demo.cn'
+      http:
+        paths:
+          - backend:
+              service:
+                name: lan-expose
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: 'home.demo.com'
+      http:
+        paths:
+          - backend:
+              service:
+                name: lan-expose
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - '*.all.demo.cn'
+        - '*.all.demo.com'
+        - 'home.demo.cn'
+        - 'home.demo.com'
+      secretName: shiyunjin-cn-sh-all
+---
