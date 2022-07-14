@@ -14,6 +14,10 @@ type ServerProxyCommon struct {
 	SSLKey  string `ini:"ssl_key"`
 }
 
+type ServerProxyWebSocket struct {
+	Mode302Domain string `ini:"mode_302_domain,omitempty"`
+}
+
 func ParseProxy(configFile string) (ServerProxyCommon, error) {
 	cfg, err := ini.Load(configFile)
 	if err != nil {
@@ -27,6 +31,16 @@ func ParseProxy(configFile string) (ServerProxyCommon, error) {
 	}
 
 	if err := commonSection.MapTo(&globalServerProxyCommon); err != nil {
+		return globalServerProxyCommon, err
+	}
+
+	// config websocket
+	webSocketSection, err := cfg.GetSection("websocket")
+	if err != nil {
+		return globalServerProxyCommon, err
+	}
+
+	if err := webSocketSection.MapTo(&globalServerProxyWebSocket); err != nil {
 		return globalServerProxyCommon, err
 	}
 
@@ -60,4 +74,10 @@ var globalServerProxyCommon ServerProxyCommon
 
 func GetServerProxyCommon() ServerProxyCommon {
 	return globalServerProxyCommon
+}
+
+var globalServerProxyWebSocket ServerProxyWebSocket
+
+func GetServerProxyWebSocket() ServerProxyWebSocket {
+	return globalServerProxyWebSocket
 }

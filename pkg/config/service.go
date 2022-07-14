@@ -7,6 +7,9 @@ type Service struct {
 	DomainSuffix []string
 	DestDomain   string
 	DestPort     string
+
+	WebSocketMode          string
+	WebSocketMode302Domain string
 }
 
 func (s *ServiceList) Add(name string, service Service) {

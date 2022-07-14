@@ -14,6 +14,14 @@ type ServerUpgradeCommon struct {
 	SSLKey  string `ini:"ssl_key,omitempty"`
 }
 
+const (
+	ServerWebSocketMode302PrefixURI = "/ws302/"
+
+	ServerWebSocketModeBlock = "block"
+	ServerWebSocketModeProxy = "proxy"
+	ServerWebSocketMode302   = "302"
+)
+
 func ParseUpgrade(configFile string) (ServerUpgradeCommon, error) {
 	cfg, err := ini.LoadSources(ini.LoadOptions{
 		AllowShadows: true,
@@ -58,6 +66,9 @@ func ParseUpgrade(configFile string) (ServerUpgradeCommon, error) {
 			DomainSuffix: section.Key("domain_suffix").ValueWithShadows(),
 			DestDomain:   section.Key("dest_domain").Value(),
 			DestPort:     port.Get(),
+
+			WebSocketMode:          section.Key("websocket_mode").Value(),
+			WebSocketMode302Domain: section.Key("websocket_mode_302_domain").Value(),
 		})
 	}
 

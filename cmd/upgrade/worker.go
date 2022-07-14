@@ -39,7 +39,7 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// upgrade websocket proxy
-	if WorkerWebSocket(w, r, service.DestDomain, service.DestPort, ip, requestId) {
+	if WorkerWebSocket(w, r, service, ip, requestId) {
 		return
 	}
 
