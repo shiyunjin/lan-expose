@@ -35,7 +35,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, os.Kill)
 
 	go func() {
-		if err := ListenAndServe(listenAddress, common.SSLCrt, common.SSLKey, Worker); err != nil {
+		if err := ListenAndServe(listenAddress, common.SSLCrt, common.SSLKey, Worker, WorkerWebSocket); err != nil {
 			log.Printf("[Serve][Error] listen and serve: %v\n", err)
 			c <- os.Interrupt
 		}

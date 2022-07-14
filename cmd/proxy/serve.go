@@ -8,7 +8,7 @@ import (
 	"github.com/lucas-clemente/quic-go/http3"
 )
 
-func ListenAndServe(listenAddress, certFile, keyFile string, handler http.HandlerFunc) error {
+func ListenAndServe(listenAddress, certFile, keyFile string, handler http.HandlerFunc, handlerProxy http.HandlerFunc) error {
 	// Load certs
 	var err error
 	certs := make([]tls.Certificate, 1)
@@ -33,20 +33,39 @@ func ListenAndServe(listenAddress, certFile, keyFile string, handler http.Handle
 	}
 	defer udpConn.Close()
 
+	tcpAddr, err := net.ResolveTCPAddr("tcp", listenAddress)
+	if err != nil {
+		return err
+	}
+	tcpConn, err := net.ListenTCP("tcp", tcpAddr)
+	if err != nil {
+		return err
+	}
+	defer tcpConn.Close()
+
+	tlsConn := tls.NewListener(tcpConn, config)
+	defer tlsConn.Close()
+
 	// Start the servers
 	httpServer := &http.Server{
 		Addr:      listenAddress,
 		TLSConfig: config,
+		Handler:   handlerProxy,
 	}
 
 	quicServer := &http3.Server{
-		Server: httpServer,
+		Server: &http.Server{
+			Addr:      listenAddress,
+			TLSConfig: config,
+			Handler:   handler,
+		},
 	}
-
-	httpServer.Handler = handler
 
 	hErr := make(chan error)
 	qErr := make(chan error)
+	go func() {
+		hErr <- httpServer.Serve(tlsConn)
+	}()
 	go func() {
 		qErr <- quicServer.Serve(udpConn)
 	}()

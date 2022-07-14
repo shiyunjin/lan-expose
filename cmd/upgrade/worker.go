@@ -38,6 +38,11 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 			`h3-29="`+altAddr+`"; ma=2592000; persist=1`,
 	)
 
+	// upgrade websocket proxy
+	if WorkerWebSocket(w, r, service.DestDomain, service.DestPort, ip, requestId) {
+		return
+	}
+
 	// send default html
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
 	w.WriteHeader(200)
