@@ -16,18 +16,17 @@ func FormatFullVersion(name string) string {
 
 	if tag != "" {
 		parts = append(parts, tag)
+	} else if branch != "" {
+		parts = append(parts, branch)
 	} else {
 		parts = append(parts, "unknown")
 	}
 
-	if branch != "" || commit != "" {
-		if branch == "" {
-			branch = "unknown"
-		}
+	if commit != "" {
 		if commit == "" {
 			commit = "unknown"
 		}
-		git := fmt.Sprintf("(git: %s %s)", branch, commit)
+		git := fmt.Sprintf("(git: %s)", commit)
 		parts = append(parts, git)
 	}
 
