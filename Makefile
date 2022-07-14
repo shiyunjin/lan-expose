@@ -13,11 +13,11 @@ PATH := $(subst :,/bin:,$(shell go env GOPATH))/bin:$(PATH)
 endif
 
 COMMIT := $(shell git rev-parse --short HEAD)
-COMMIT_BRANCH := $(shell git branch -l --points-at HEAD --format "%(refname:strip=2)")
+COMMIT_BRANCH := $(shell git branch -l --points-at HEAD --format "%(refname:strip=2)" | awk 'END {print}')
 COMMIT_TAG := $(shell git tag -l --points-at HEAD --format "%(refname:strip=2)")
 
 LDFLAGS:=-s -w -X github.com/shiyunjin/lan-expose/pkg/version.commit=${COMMIT} -X github.com/shiyunjin/lan-expose/pkg/version.branch=${COMMIT_BRANCH}
-ifeq ("${COMMIT_TAG}", "")
+ifneq ("${COMMIT_TAG}", "")
 	LDFLAGS:=$(LDFLAGS) -X github.com/shiyunjin/lan-expose/pkg/version.tag=${COMMIT_TAG}
 endif
 
