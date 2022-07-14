@@ -18,7 +18,7 @@ env:
 
 jobs:
   build-docker:
-    name: Build Upgrade
+    name: Build Image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
