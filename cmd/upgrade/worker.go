@@ -8,6 +8,7 @@ import (
 
 	"github.com/netinternet/remoteaddr"
 	"github.com/shiyunjin/lan-expose/pkg/config"
+	"github.com/shiyunjin/lan-expose/pkg/utils"
 )
 
 //go:embed check-page/index.html
@@ -34,7 +35,7 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 	ip, _ := remoteaddr.Parse().IP(r)
 	requestId := r.Header.Get("CF-ray")
 	if requestId == "" {
-		requestId = GetRay()
+		requestId = utils.GetRay()
 	}
 
 	// search service
