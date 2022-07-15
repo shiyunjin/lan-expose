@@ -6,7 +6,7 @@
 [README](README.md)
 
 Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，使你和往常一样使用浏览器 (Chrome, Firefox, Edge) 
-访问暴露到公网的网站， **无需指定端口号**. 仅支持 HTTPS。
+访问暴露到公网的网站， **无需指定端口号**。 仅支持 HTTPS。
 
 ## 为什么使用 Lan Expose
 
@@ -27,6 +27,7 @@ Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，�
 
 ## 特性
  > README 文档正在撰写中 ***Draft**
+
 ### 配置文件
 
 你可以在这里查看完整的配置文件和注解，来查看未在这里描述的所有功能。
@@ -35,17 +36,107 @@ Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，�
 
 [完整配置 - 在局域网搭建 (Proxy)](./conf/proxy.ini)
 
-### Websocket
+### Websocket 兼容
 
-#### Mode
- * Block
- * Proxy
- * 302
+由于 QUIC 推行 `WebTransport`，导致支持 `Websocket over HTTP/3`**RFC9220** 至今没有通过。
+所以协议和主流客户端并没有支持直接进行连接，会自动降级到 `HTTP/2` 导致无法连接。
 
-#### Block
+我提供了几种方式可以选择如何处理 `Websocket` 流量，以达到兼容的目的。
 
-#### Proxy
+ * `Block` 阻止 `Websocket` 的访问请求 ***默认***
+ * `Proxy` 通过服务器代理 `Websocket` 流量 (兼容性最好, 且不泄露 `SNI`，须消耗服务器流量)
+ * `302`   重定向 `Websocket` 流量到直连地址，需要客户端支持 (存在泄漏 `SNI` 风险)
 
-#### 302
+#### Block Mode
+
+这是默认值，如无需使用 `Websocket`，请保持为这个值。 
+这将会阻止所有尝试通过 `Websocket` 方式进行的请求。
+
+#### Proxy Mode
+
+ > 如果你需要使用 `Websocket`，推荐使用这个模式。
+
+通过服务器转发 `Websocket` 流量，可以达到完美的兼容性。但是缺点也很明显，会消耗服务器的流量。
+我自用的应用 `Websocket` 流量较小，其实不会消耗特别多。
+
+#### 302 Mode
+
+重定向 `Websocket` 流量到直连地址，无需消耗流量。看起来是这么的美好，并且符合 `RFC6455` 规范， 但其中有一句话。
+
+ >   1.  If the status code received from the server is not 101, the
+         client handles the response per HTTP [RFC2616] procedures.  In
+         particular, the client might perform authentication if it
+         receives a 401 status code; the server might redirect the client
+         using a 3xx status code **(but clients are not required to follow
+         them)**, etc.  Otherwise, proceed as follows.
+
+***但客户端不需要遵循它们***，所以经过测试，绝大多数客户端并没有做兼容（包括 Chrome）。
+
+事情不是绝对的，你可以很容易的自己完成对其兼容的适配。比如说：
+ * [阿里云应用高可用服务 AHAS - WebSocket多活实践](https://help.aliyun.com/document_detail/188595.html) 中提到：
+   
+``` nodejs
+您可以重点关注Client，以下示例采用NodeJS的WebSocket Library：
+
+const WebSocket = require('ws');
+
+let host = "http://websocket.msha.tech/";
+
+let routerId = 1111;
+// routerId = 6249;
+routerId = 8330;
+
+let options = {
+    'headers': {
+        routerId: routerId,
+        unitType: "unit_type",
+    }
+};
+
+let ws = handleWs();
+
+function handleWs(){
+    let ws = new WebSocket(host,[],options);
+    ws.on('upgrade', function open(resp) {
+        // console.log('upgrade ',resp);
+    });
+
+    ws.on('open', function open() {
+        console.log('connected:'+routerId);
+        ws.send(Date.now());
+    });
+
+    ws.on('error', function error(e) {
+        console.log('err',e);
+    });
+
+    ws.on('close', function close() {
+        console.log('disconnected');
+    //断连后重连。
+        let retryTime = 1500;
+        setTimeout(()=>{
+            console.log('!!! reconnecting in ...'+retryTime+' ms');
+            ws = handleWs();
+        }, retryTime);
+    });
+
+    ws.on('message', function incoming(data) {
+        console.log(`msg: ${data} `);
+    });
+
+    ws.on('unexpected-response', function handleerr(req,resp) {
+        //处理重定向。
+    if ((resp.statusCode+'').startsWith("30")){
+            console.log("!!! redirecting... from ", host," to",resp.headers.location);
+            host = resp.headers.location;
+            ws = handleWs();
+        }
+
+    });
+    return ws;
+}
+```
+ * [3p3r/websocket-redirect-shim](https://github.com/3p3r/websocket-redirect-shim) 或者使用这个包
 
 ### Check Page
+> README 文档正在撰写中 ***Draft**
