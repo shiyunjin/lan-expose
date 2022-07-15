@@ -73,6 +73,8 @@ Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，�
 ***但客户端不需要遵循它们***，所以经过测试，绝大多数客户端并没有做兼容（包括 Chrome）。
 
 事情不是绝对的，你可以很容易的自己完成对其兼容的适配。比如说：
+ * 使用这个 [3p3r/websocket-redirect-shim](https://github.com/3p3r/websocket-redirect-shim) 包
+ * 使用 `ws` 包，并将其中的 [followRedirects](https://github.com/websockets/ws/blob/d2c935a477fa6999c8fa85b89dfae27b85b807e7/doc/ws.md?plain=1#L272) 设为 `true`
  * [阿里云应用高可用服务 AHAS - WebSocket多活实践](https://help.aliyun.com/document_detail/188595.html) 中提到：
    
 ``` nodejs
@@ -136,7 +138,6 @@ function handleWs(){
     return ws;
 }
 ```
- * [3p3r/websocket-redirect-shim](https://github.com/3p3r/websocket-redirect-shim) 或者使用这个包
 
 ### Check Page
 > README 文档正在撰写中 ***Draft**
