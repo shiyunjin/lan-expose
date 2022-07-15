@@ -10,8 +10,8 @@ import (
 	"github.com/shiyunjin/lan-expose/pkg/config"
 )
 
-//go:embed index.html
-//go:embed favicon.ico
+//go:embed check-page/index.html
+//go:embed check-page/favicon.ico
 var f embed.FS
 
 var (
@@ -21,7 +21,7 @@ var (
 
 func init() {
 	var err error
-	checkT, err = template.ParseFS(f, "index.html")
+	checkT, err = template.ParseFS(f, "check-page/index.html")
 	if err != nil {
 		log.Printf("internal check template error: %v", err)
 		return
@@ -89,7 +89,7 @@ func Worker(w http.ResponseWriter, r *http.Request) {
 
 // Favicon icon file
 func Favicon(writer http.ResponseWriter, request *http.Request) {
-	content, err := f.ReadFile("favicon.ico")
+	content, err := f.ReadFile("check-page/favicon.ico")
 	if err != nil {
 		writer.WriteHeader(404)
 		_, _ = writer.Write([]byte("file not found"))
