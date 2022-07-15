@@ -54,11 +54,9 @@ func ListenAndServe(listenAddress, certFile, keyFile string, handler http.Handle
 	}
 
 	quicServer := &http3.Server{
-		Server: &http.Server{
-			Addr:      listenAddress,
-			TLSConfig: config,
-			Handler:   handler,
-		},
+		Addr:      listenAddress,
+		TLSConfig: config,
+		Handler:   handler,
 	}
 
 	hErr := make(chan error)
