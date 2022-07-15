@@ -1,7 +1,7 @@
 # Lan Expose
 
-![GitHub Workflow Status](https://github.com/shiyunjin/lan-expose/actions/workflows/go.yml/badge.svg)
-[![GitHub release](https://img.shields.io/github/tag/shiyunjin/lan-expose.svg?label=release)](https://github.com/fatedier/frp/releases)
+[![GitHub Workflow Status](https://github.com/shiyunjin/lan-expose/actions/workflows/go.yml/badge.svg)](https://github.com/shiyunjin/lan-expose/actions/workflows/go.yml)
+[![GitHub release](https://img.shields.io/github/tag/shiyunjin/lan-expose.svg?label=release)](https://github.com/shiyunjin/lan-expose/releases)
 
 [README](README.md)
 
@@ -36,5 +36,16 @@ Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，�
 [完整配置 - 在局域网搭建 (Proxy)](./conf/proxy.ini)
 
 ### Websocket
+
+#### Mode
+ * Block
+ * Proxy
+ * 302
+
+#### Block
+
+#### Proxy
+
+#### 302
 
 ### Check Page
