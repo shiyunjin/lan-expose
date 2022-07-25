@@ -24,11 +24,29 @@ Lan Expose 原理上依托于 `HTTP Alternative Services` **RFC7838** ，并提�
 
 `Upgrade` 将访问用户接收和完成SSL握手，并向其发送 `Alt-Svc` 请求，将其重定向到对应的 `Proxy` 服务。 `Proxy` 服务接受到用户请求后，使用配置文件路由将协议降级转换到目标服务器。
 
+```mermaid
+sequenceDiagram
+  participant 浏览器
+  participant Upgrade
+  participant Proxy
+  participant 目标网站
+  浏览器->>Upgrade: 建立SSL链接，发送Http请求
+  loop Check Page
+      Upgrade->>Upgrade: 将Http重定向到Https
+  end
+  Upgrade-->>浏览器: 发送Alt-Svc，指向Proxy
+  Note left of Proxy: 这里是直连
+  浏览器->>+Proxy: 发送 Request 请求网站
+  Proxy->>+目标网站:请求网站
+  目标网站-->>-Proxy:响应网站内容
+  Proxy-->>-浏览器: 返回网站内容
+```
+
 ## 快速使用
 目前可以在 Github 的 [Release](https://github.com/shiyunjin/lan-expose/releases) 页面中下载到最新版本的客户端和服务端二进制文件。你也可以在 [Actions](https://github.com/shiyunjin/lan-expose/actions) 下载到每个合并到主线版本的 `Commit` 版本。
 
 我们也提供 Docker 镜像以方便部署 （仅当发布 Release 版本后，Docker镜像才会进行推送）
-```
+``` shell
 # Ghcr
 #  - Proxy 
 docker pull ghcr.io/shiyunjin/lan-expose-proxy:v0.1.0
@@ -43,7 +61,7 @@ docker pull ghcr.io/shiyunjin/lan-expose-upgrade:v0.1.0
 
 
 Proxy Docker 部署
-```
+``` shell
 #!/usr/bin/env bash
 
 # setup sysctl max udp
@@ -120,8 +138,8 @@ docker run -d --restart=always --name="lan-expose-proxy" \
  * 使用 `ws` 包，并将其中的 [followRedirects](https://github.com/websockets/ws/blob/d2c935a477fa6999c8fa85b89dfae27b85b807e7/doc/ws.md?plain=1#L272) 设为 `true`
  * [阿里云应用高可用服务 AHAS - WebSocket多活实践](https://help.aliyun.com/document_detail/188595.html) 中提到：
    
-``` nodejs
-您可以重点关注Client，以下示例采用NodeJS的WebSocket Library：
+``` javascript
+// 您可以重点关注Client，以下示例采用NodeJS的WebSocket Library：
 
 const WebSocket = require('ws');
 
