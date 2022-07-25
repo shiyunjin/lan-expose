@@ -25,7 +25,7 @@ Lan Expose 原理上依托于 `HTTP Alternative Services` **RFC7838** ，并提�
 `Upgrade` 将访问用户接收和完成SSL握手，并向其发送 `Alt-Svc` 请求，将其重定向到对应的 `Proxy` 服务。 `Proxy` 服务接受到用户请求后，使用配置文件路由将协议降级转换到目标服务器。
 
 ## 快速使用
-目前可以在 Github 的 [Release](./releases) 页面中下载到最新版本的客户端和服务端二进制文件。你也可以在 [Actions](./actions) 下载到每个合并到主线版本的 `Commit` 版本。
+目前可以在 Github 的 [Release](https://github.com/shiyunjin/lan-expose/releases) 页面中下载到最新版本的客户端和服务端二进制文件。你也可以在 [Actions](https://github.com/shiyunjin/lan-expose/actions) 下载到每个合并到主线版本的 `Commit` 版本。
 
 我们也提供 Docker 镜像以方便部署 （仅当发布 Release 版本后，Docker镜像才会进行推送）
 ```
@@ -37,7 +37,7 @@ docker pull ghcr.io/shiyunjin/lan-expose-upgrade:v0.1.0
 ```
 
 ## 部署 Example
- > `Proxy` 需要部署在  未开放 `443,80` 端口 的局域网内，并确保端口映射配置正确，外网正常开启（默认端口：690）
+ > `Proxy` 需要部署在  未开放 `443,80` 端口 的局域网内，并确保外网端口映射配置正确（默认端口：690）
  > 
  > `Upgrade` 需要部署在 开放了 `80,443` 端口的服务器上，以提供正确的握手服务（可经过Nginx等服务中转）。
 
