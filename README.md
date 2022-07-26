@@ -20,7 +20,7 @@ Lan Expose 是一个可以优雅的在被封禁 `443,80` 端口的情况下，�
  * 提供 Docker 和多种部署方式和平台支持
 
 ## 原理
-Lan Expose 原理上依托于 `HTTP Alternative Services` **RFC7838** ，并提供一整套开箱即用的以 `Upgrade` 和 `Porxy` 服务为基础的解决方案。
+Lan Expose 原理上依托于 `HTTP Alternative Services` **RFC7838** ，并提供一整套开箱即用的以 `Upgrade` 和 `Proxy` 服务为基础的解决方案。
 
 `Upgrade` 将访问用户接收和完成SSL握手，并向其发送 `Alt-Svc` 请求，将其重定向到对应的 `Proxy` 服务。 `Proxy` 服务接受到用户请求后，使用配置文件路由将协议降级转换到目标服务器。
 
@@ -60,8 +60,8 @@ docker pull ghcr.io/shiyunjin/lan-expose-upgrade:v0.1.0
  > `Upgrade` 需要部署在 开放了 `80,443` 端口的服务器上，以提供正确的握手服务（可经过Nginx等服务中转）。
 
 
-Proxy Docker 部署
-``` shell
+Proxy Docker 部署 （部署在内网）
+``` bash
 #!/usr/bin/env bash
 
 # setup sysctl max udp
@@ -73,13 +73,34 @@ sysctl -p
 ## 并且请用 `-c <dir>/<file>.ini` 指定配置文件目录
 # run
 docker run -d --restart=always --name="lan-expose-proxy" \
-  -v /volume1/docker/lan-expose-proxy/proxy.ini:/config/proxy.ini \
-  -v /volume1/homes/syj/syno-acme/acme.sh/ **#YOUR DOMAIN#** /fullchain.cer:/config/ssl.crt \
-  -v /volume1/homes/syj/syno-acme/acme.sh/ **#YOUR DOMAIN#** / **#YOUR DOMAIN#** .key:/config/ssl.key \
+  -v <config dir>/proxy.ini:/config/proxy.ini \
+  -v <config dir>/syno-acme/acme.sh/<YOUR DOMAIN>/fullchain.cer:/config/ssl.crt \
+  -v <config dir>/syno-acme/acme.sh/<YOUR DOMAIN>/<YOUR DOMAIN>.key:/config/ssl.key \
   -p 690:690/tcp \
   -p 690:690/udp \
   ghcr.io/shiyunjin/lan-expose-proxy:v0.1.0 \
   -c /config/proxy.ini
+
+```
+
+Upgrade Docker 部署 （部署在外网服务器）
+``` bash
+#!/usr/bin/env bash
+
+## docker 镜像内不 含有 `conf` 配置文件，需要 `-v` 映射到镜像里启动 
+## 并且请用 `-c <dir>/<file>.ini` 指定配置文件目录
+
+## 80 端口可自定义，可前置Nginx分流（Nginx上挂证书）
+## 如直接开启 SSL 需要指定443端口
+
+# run
+docker run -d --restart=always --name="lan-expose-upgrade" \
+  -v <config dir>/proxy.ini:/config/upgrade.ini \
+  -v <config dir>/syno-acme/acme.sh/<YOUR DOMAIN>/fullchain.cer:/config/ssl.crt \
+  -v <config dir>/syno-acme/acme.sh/<YOUR DOMAIN>/<YOUR DOMAIN>.key:/config/ssl.key \
+  -p 80:80/tcp \
+  ghcr.io/shiyunjin/lan-expose-upgrade:v0.1.0 \
+  -c /config/upgrade.ini
 
 ```
 
